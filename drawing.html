@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Drawingboard.js: a simple canvas based drawing app that you can integrate easily on your website.</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width">
+
+		<link rel="stylesheet" href="/js/draw/prism.css">
+		<link rel="stylesheet" href="/js/draw/website.css">
+
+
+		<!-- in a production environment, you can include the minified css. It contains the css of the board and the default controls (size, nav, colors):
+		<link rel="stylesheet" href="../dist/drawingboard.min.css"> -->
+		<link rel="stylesheet" href="/css/drawingboard.css">
+
+		<style>
+		/*
+		* drawingboards styles: set the board dimensions you want with CSS
+		*/
+		.board {
+			margin: 0 auto;
+			width: 400px;
+			height: 400px;
+		}
+		</style>
+		
+		<style data-example="3">
+			#custom-board-2 {
+				width: 1000px;
+				height: 600px;
+			}
+
+			#custom-board-2 canvas {
+				transform: scale(0.95);
+			}
+		</style>
+
+	</head>
+	<body>
+		
+		<noscript>JavaScript is required :(</noscript>
+
+		
+
+		<form class="drawing-form" action="/framework/core/upload_64.php" method="post">
+			<div class="example" data-example="3">			
+			  <!-- this will be the drawingboard container -->
+			  <div class="board" id="custom-board-2">
+
+			  </div>
+
+			  <!-- this will be the input used to pass the drawingboard content to the server -->
+			  <input type="hidden" name="image" value="">
+
+			  <label>Name <input type="text" name="name" /></label>
+
+			  <button>Submit</button>
+			
+			</div>
+		</form>
+		<button onclick="findImage()">Visa bild i consol</button>
+
+		
+		<!-- jquery is required - zepto might do the trick too -->
+		<script src="js/jquery.min.js"></script>
+		<script src="js/simple-undo.js"></script>
+
+		<!-- in a production environment, just include the minified script. It contains the board and the default controls (size, nav, colors, download): -->
+		<!--<script src="../dist/drawingboard.min.js"></script>-->
+
+		<script src="js/utils.js"></script>
+		<script src="js/board.js"></script>
+		<script src="js/controls/control.js"></script>
+		<script src="js/controls/color.js"></script>
+		<script src="js/controls/drawingmode.js"></script>
+		<script src="js/controls/navigation.js"></script>
+		<script src="js/controls/size.js"></script>
+		<script src="js/controls/download.js"></script>
+
+
+		<!-- an input[type=range] poyfill is more than recommanded if you want to use the default "size" control with the "range" type *on every browser*
+			the polyfill is loaded only if necessary via yepnope http://yepnopejs.com/
+
+			note this is totally not required if the size control is set to "auto" or "dropdown" - the control will work with every browser with an alternate view -->
+		<script src="/js/draw/yepnope.js"></script>
+
+
+		<script>
+		var myBoard = new DrawingBoard.Board('custom-board-2', {
+
+				controls: [
+					'Color',
+					{ Size: { type: 'dropdown' } },
+					{ DrawingMode: { filler: false } },
+					'Navigation',
+					'Download'
+				],
+				size: 10,
+				color: "#f00",
+				webStorage: 'session',
+				enlargeYourContainer: true,
+				droppable: true, //try dropping an image on the canvas!
+				stretchImg: true //the dropped image can be automatically ugly resized to to take the canvas size
+			});
+
+		$('.drawing-form').on('submit', function(e) {
+		 
+		  var img = myBoard.getImg();
+		 
+		  var imgInput = (myBoard.blankCanvas == img) ? '' : img;
+		  
+		  $(this).find('input[name=image]').val( imgInput );
+
+		  myBoard.clearWebStorage();
+		});
+
+		function findImage(){
+			 var img = myBoard.getImg();
+		  	
+		 	 var imgInput = (myBoard.blankCanvas == img) ? '' : img;
+
+		 	 var url= "http://camlogg.xn--fors-8qa.se/uploads/alfahanne.png";
+		 	 myBoard.setImg(url);		 	
+		}
+
+		</script>
+
+
+
+
+
+
+
+		<script>
+		
+			var iHasRangeInput = function() {
+				var inputElem  = document.createElement('input'),
+					smile = ':)',
+					docElement = document.documentElement,
+					inputElemType = 'range',
+					available;
+				inputElem.setAttribute('type', inputElemType);
+				available = inputElem.type !== 'text';
+				inputElem.value         = smile;
+				inputElem.style.cssText = 'position:absolute;visibility:hidden;';
+				if ( /^range$/.test(inputElemType) && inputElem.style.WebkitAppearance !== undefined ) {
+					docElement.appendChild(inputElem);
+					defaultView = document.defaultView;
+					available = defaultView.getComputedStyle &&
+						defaultView.getComputedStyle(inputElem, null).WebkitAppearance !== 'textfield' &&
+						(inputElem.offsetHeight !== 0);
+					docElement.removeChild(inputElem);
+				}
+				return !!available;
+			};
+
+			yepnope({
+				test : iHasRangeInput(),
+				nope : ['fd-slider.min.css', 'fd-slider.min.js'],
+				callback: function(id, testResult) {
+					if("fdSlider" in window && typeof (fdSlider.onDomReady) != "undefined") {
+						try { fdSlider.onDomReady(); } catch(err) {}
+					}
+				}
+			});
+		</script>
+
+		<script data-example="3">
+		/*
+			var customBoard2 = new DrawingBoard.Board('custom-board-2', {
+				
+				controls: [
+					'Color',
+					{ Size: { type: 'dropdown' } },
+					{ DrawingMode: { filler: false } },
+					'Navigation',
+					'Download'
+				],
+				size: 10,
+				color: "#f00",
+				webStorage: 'session',
+				enlargeYourContainer: true,
+				droppable: true, //try dropping an image on the canvas!
+				stretchImg: true //the dropped image can be automatically ugly resized to to take the canvas size
+			});*/
+		</script>
+
+
+		<!-- totally not drawingboard-related code -->
+		<script src="/js/draw/prism.js"></script>
+		<script src="/js/draw/script.js"></script>
+	</body>
+</html>
